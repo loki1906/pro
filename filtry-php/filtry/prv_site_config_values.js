@@ -1,0 +1,1 @@
+var siteConfig={na:"1456421426",c:"58",adult:"0",script:"0",external:"0",cat:"inne",sub:"inne_7",s:"mkafiltry.prv.pl",cs:"3862"};

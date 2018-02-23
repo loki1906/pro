@@ -1,0 +1,396 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/szablon.xhtml">
+	<ui:define name="content">
+	<p:growl id="msg" showDetail="true" />
+		<p:tabView id="taby" dynamic="true" cache="true">
+		<p:ajax event="tabChange" listener="#{pobierzPaliwoBean.onTabChange}" update=":msg"/>
+			<p:tab title="tankowanie" id="tank">
+				<h:form>
+					<h:panelGrid columns="2" cellpadding="5">
+						<p:outputLabel for="dataOd" value="Data od" />
+						<p:calendar id="dataOd" ajax="true"
+							value="#{pobierzPaliwoBean.dataOd}" locale="pl" navigator="true"
+							pattern="yyyy-MM-dd" mask="true">
+							<p:ajax event="dateSelect"
+								listener="#{pobierzPaliwoBean.updateDataOd}" update="dataOd,rowEditingTable" />
+							<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+						</p:calendar>
+						<p:outputLabel for="dataDo" value="Data do" />
+						<p:calendar id="dataDo" value="#{pobierzPaliwoBean.dataDo}"
+							locale="pl" navigator="true" pattern="yyyy-MM-dd" mask="true">
+							<p:ajax event="dateSelect"
+								listener="#{pobierzPaliwoBean.updateDataDo}" update="dataDo,rowEditingTable" />
+							<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+						</p:calendar>
+						
+					</h:panelGrid>
+					<p:contextMenu for="rowEditingTable">
+						<p:menuitem value="Dodaj nowy" update="rowEditingTable"
+							icon="ui-icon-plusthick"
+							actionListener="#{pobierzPaliwoBean.dodajPaliwo}" />
+						<p:menuitem value="Usuń zaznaczone" update="rowEditingTable"
+							icon="ui-icon-trash"
+							actionListener="#{pobierzPaliwoBean.usunPaliwo}" />
+					</p:contextMenu>
+					<p:dataTable id="rowEditingTable" var="paliwo"
+						widgetVar="paliwoTable" value="#{pobierzPaliwoBean.paliwa}"
+						paginator="true" rows="15" rowKey="#{paliwo.id}"
+						selection="#{pobierzPaliwoBean.zaznaczone}" 
+						filteredValue="#{pobierzPaliwoBean.paliwaFiltrowane}"
+						paginatorPosition="bottom" style="width:900px" editable="true">
+						<f:facet name="header">  
+			            	Twoje zapisy tankowania 
+			        	</f:facet>
+			        	<p:ajax event="rowEdit" listener="#{pobierzPaliwoBean.onRowEdit}" update=":msg" />
+			<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+						<p:column filterBy="#{paliwo.rodzPaliwa}">
+							<f:facet name="header">
+								<h:outputText value="Rodzaj paliwa" />
+								<f:facet name="filter">
+									<p:selectOneMenu onchange="PF('paliwoTable').filter()">
+										<f:selectItem id="rodzPal" itemLabel="Wszystkie"
+											itemValue="#{null}" noSelectionOption="true" />
+										<f:selectItems value="#{pobierzPaliwoBean.rodzajePaliwa}" />
+									</p:selectOneMenu>
+								</f:facet>
+							</f:facet>
+
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{paliwo.rodzPaliwa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:selectOneMenu value="#{paliwo.rodzPaliwa}" style="width:100%">
+										<f:selectItems value="#{pobierzPaliwoBean.rodzajePaliwa}"
+											var="rodzPaliwa" itemLabel="#{rodzPaliwa}"
+											itemValue="#{rodzPaliwa}" />
+									</p:selectOneMenu>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column sortBy="#{paliwo.iloscPaliwa}">
+							<f:facet name="header">
+								<h:outputText value="Ilość paliwa" />
+							</f:facet>
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{paliwo.iloscPaliwa}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{paliwo.iloscPaliwa}" 
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Cena za litr" />
+							</f:facet>
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{paliwo.cenaZaLitr}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{paliwo.cenaZaLitr}" 
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="Przebieg przy tankowaniu" />
+							</f:facet>
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{paliwo.przebiegTankowania}" />
+								</f:facet>
+								<f:facet name="input">
+									<p:inputNumber value="#{paliwo.przebiegTankowania}" 
+										style="width:100%" />
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column filterBy="#{paliwo.dataTankowania}">
+							<f:facet name="header">
+								<h:outputText value="Data tankowania" />
+								<f:facet name="filter">
+									<h:outputText value=" " />
+								</f:facet>
+							</f:facet>
+							<p:cellEditor>
+								<f:facet name="output">
+									<h:outputText value="#{paliwo.dataTankowania}">
+										<f:convertDateTime type="date" pattern="yyyy-MM-dd" timeZone="GMT+1" />
+									</h:outputText>
+								</f:facet>
+								<f:facet name="input">
+									<p:calendar value="#{paliwo.dataTankowania}" locale="pl"
+										navigator="true" pattern="yyyy-MM-dd" mask="true"
+										style="width:100%">
+										<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+									</p:calendar>
+								</f:facet>
+							</p:cellEditor>
+						</p:column>
+						<p:column style="width:4%" exportable="false">
+							<p:rowEditor />
+						</p:column>
+					</p:dataTable>
+					<br />
+					<p:commandButton value="Zapisz" icon="ui-icon-pencil" update="msg">
+						<p:ajax event="click"
+							listener="#{pobierzPaliwoBean.zapiszEdytowane()}"
+							update="rowEditingTable"></p:ajax>
+					</p:commandButton>
+					<p:commandButton process="@form" value="Anuluj" icon="ui-icon-cancel" style="margin-left: 20px">
+							<p:ajax event="click"
+								listener="#{pobierzPaliwoBean.pobierzPaliwaOsoby()}"
+								update="rowEditingTable"></p:ajax>
+					</p:commandButton>
+					
+					<br />
+					<br />
+				</h:form>
+			</p:tab>
+			<p:tab title="przeglądy" id="prze">
+					<h:form>
+						<p:contextMenu for="rowEditingTablePrz">
+						<p:menuitem value="Dodaj nowy" update="rowEditingTablePrz"
+							icon="ui-icon-plusthick"
+							actionListener="#{pobierzPrzegladyBean.dodajPrzeglad}" />
+						<p:menuitem value="Usuń zaznaczone" update="rowEditingTablePrz"
+							icon="ui-icon-trash"
+							actionListener="#{pobierzPrzegladyBean.usunPrzeglad}" />
+						</p:contextMenu>
+						<p:dataTable id="rowEditingTablePrz" var="przeglad"
+							widgetVar="przegladyTable"
+							value="#{pobierzPrzegladyBean.przeglady}" paginator="true"
+							rows="15" paginatorPosition="bottom" style="width:900px"
+							rowKey="#{przeglad.id}" selection="#{pobierzPrzegladyBean.zaznaczone}"  
+							editable="true">
+							<f:facet name="header">  
+			            		Twoje przeglądy
+			        		</f:facet>
+			        		<p:ajax event="rowEdit" listener="#{pobierzPrzegladyBean.onRowEdit}" update=":msg" />
+							<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Opis stacji" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{przeglad.opisStacji}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{przeglad.opisStacji}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Data przeglądu" />
+									<f:facet name="filter">
+										<h:outputText value=" " />
+									</f:facet>
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{przeglad.dataPrzegladu}">
+											<f:convertDateTime type="date" pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:calendar value="#{przeglad.dataPrzegladu}" style="width:100%"
+											locale="pl" navigator="true" pattern="yyyy-MM-dd" mask="true">
+
+											<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</p:calendar>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Data ważności" />
+									<f:facet name="filter">
+										<h:outputText value=" " />
+									</f:facet>
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{przeglad.dataWaznosci}">
+											<f:convertDateTime type="date" pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:calendar value="#{przeglad.dataWaznosci}" style="width:100%"
+											locale="pl" navigator="true" pattern="yyyy-MM-dd" mask="true">
+
+											<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</p:calendar>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Uwagi" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{przeglad.uwagi}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{przeglad.uwagi}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column style="width:4%" exportable="false">
+								<p:rowEditor />
+							</p:column>
+						</p:dataTable>
+						<br />
+						
+						<p:commandButton value="Zapisz" icon="ui-icon-pencil" update="msg">
+							<p:ajax event="click"
+								listener="#{pobierzPrzegladyBean.zapiszEdytowane()}"
+								update="rowEditingTablePrz"></p:ajax>
+						</p:commandButton>
+						<p:commandButton process="@form" value="Anuluj" icon="ui-icon-cancel" style="margin-left: 20px">
+							<p:ajax event="click"
+								listener="#{pobierzPrzegladyBean.pobierzPrzeglady()}"
+								update="rowEditingTablePrz"></p:ajax>
+						</p:commandButton>
+					
+						<br />
+
+					</h:form>
+			</p:tab>
+			<p:tab title="mandaty" id="mand">
+					<h:form>
+						<p:contextMenu for="rowEditingTableMan">
+						<p:menuitem value="Dodaj nowy" update="rowEditingTableMan"
+							icon="ui-icon-plusthick"
+							actionListener="#{pobierzMandatyBean.dodajMandat}" />
+						<p:menuitem value="Usuń zaznaczone" update="rowEditingTableMan"
+							icon="ui-icon-trash"
+							actionListener="#{pobierzMandatyBean.usunMandat}" />
+						</p:contextMenu>
+						<p:dataTable id="rowEditingTableMan" var="mandat"
+							widgetVar="mandatyTable" 
+							value="#{pobierzMandatyBean.mandaty}" paginator="true" 
+							rows="15" paginatorPosition="bottom" style="width:900px" 
+							rowKey="#{mandat.id}" selection="#{pobierzMandatyBean.zaznaczone}"  
+							editable="true">
+							<f:facet name="header">  
+			            		Twoje mandaty
+			        		</f:facet>
+							<p:ajax event="rowEdit" listener="#{pobierzMandatyBean.onRowEdit}" update=":msg" />
+							<p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+							
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Miasto" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{mandat.miasto}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{mandat.miasto}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Rodzaj wykroczenia" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{mandat.rodzajWykroczenia}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputText value="#{mandat.rodzajWykroczenia}" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Data otrzymania" />
+									<f:facet name="filter">
+										<h:outputText value=" " />
+									</f:facet>
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{mandat.dataOtrzymania}">
+											<f:convertDateTime type="date" pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</h:outputText>
+									</f:facet>
+									<f:facet name="input">
+										<p:calendar value="#{mandat.dataOtrzymania}" locale="pl"
+											navigator="true" pattern="yyyy-MM-dd" mask="true"
+											style="width:100%">
+											<f:convertDateTime pattern="yyyy-MM-dd" timeZone="GMT+1" />
+										</p:calendar>
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Otrzymane pkt" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{mandat.otrzymanePkt}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputNumber value="#{mandat.otrzymanePkt}" decimalPlaces="0"
+										style="width:100%" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+							<p:column>
+								<f:facet name="header">
+									<h:outputText value="Kwota" />
+								</f:facet>
+								<p:cellEditor>
+									<f:facet name="output">
+										<h:outputText value="#{mandat.kwota}" />
+									</f:facet>
+									<f:facet name="input">
+										<p:inputNumber value="#{mandat.kwota}" 	style="width:100%" />
+									</f:facet>
+								</p:cellEditor>
+							</p:column>
+
+							<p:column style="width:4%" exportable="false">
+								<p:rowEditor />
+							</p:column>
+						</p:dataTable>
+						<br />
+						<p:commandButton value="Zapisz" icon="ui-icon-pencil" update="msg">
+							<p:ajax event="click"
+								listener="#{pobierzMandatyBean.zapiszEdytowane()}"
+								update="rowEditingTableMan"></p:ajax>
+						</p:commandButton>
+						<p:commandButton process="@form" value="Anuluj" icon="ui-icon-cancel" style="margin-left: 20px">
+							<p:ajax event="click"
+								listener="#{pobierzMandatyBean.pobierzMandaty()}"
+								update="rowEditingTableMan"></p:ajax>
+						</p:commandButton>
+						<br />
+						<br />
+					</h:form>
+			</p:tab>
+		</p:tabView>
+
+	</ui:define>
+</ui:composition>
+</html>

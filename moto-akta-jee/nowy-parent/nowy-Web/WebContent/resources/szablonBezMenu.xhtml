@@ -1,0 +1,62 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<script type="text/javascript">
+		PrimeFaces.locales['pl'] = {
+			closeText : 'Zamknij',
+			prevText : 'Poprzedni',
+			nextText : 'Następny',
+			monthNames : [ 'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj',
+					'Czerwiec', 'Lipiec', 'Sierpień', 'Wrzesień',
+					'Październik', 'Listopad', 'Grudzień' ],
+			monthNamesShort : [ 'Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze',
+					'Lip', 'Sie', 'Wrz', 'Paź', 'Lis', 'Gru' ],
+			dayNames : [ 'Niedziela', 'Poniedziałek', 'Wtorek', 'Środa',
+					'Czwartek', 'Piątek', 'Sobota' ],
+			dayNamesShort : [ 'Nie', 'Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'So' ],
+			dayNamesMin : [ 'N', 'P', 'W', 'Ś', 'Cz', 'P', 'S' ],
+			weekHeader : 'Tydzień',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : 'rok',
+			timeOnlyTitle : 'Tylko czas',
+			timeText : 'Czas',
+			hourText : 'Godzina',
+			minuteText : 'Minuta',
+			secondText : 'Sekunda',
+			currentText : 'Teraz',
+			ampm : false,
+			month : 'Miesiąc',
+			week : 'Tydzień',
+			day : 'Dzień',
+			allDayText : 'Cały dzień'
+		};
+	</script>
+</h:head>
+
+<h:body>
+	<h:outputStylesheet library="css" name="styl.css" />
+	<table class="podst">
+		<tr>
+			<td valign="top">
+				<p:fieldset class="userPanel" position="north">
+				</p:fieldset>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">
+				<p:growl id="msgs" showDetail="false" />
+				<div id="content">
+					<ui:insert name="content"></ui:insert>
+				</div>
+				<!--  <div class="footer">Jesteś zalogowany jako : #{loginBean.name}</div> -->
+			</td>
+		</tr>
+	</table>
+</h:body>
+</html>
